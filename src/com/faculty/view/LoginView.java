@@ -5,16 +5,18 @@ import java.awt.*;
 
 public class LoginView extends JFrame {
 
-    private JTextField txtUsername;
-    private JPasswordField txtPassword;
+    private JTextField txtUsername, txtSignUpUsername;
+    private JPasswordField txtPassword, txtSignUpPassword, txtConfirmPassword;
     private JButton btnAdmin, btnStudent, btnLecturer, btnLogin;
     private JButton btnSignInTab, btnSignUpTab;
+    private JButton btnSignUpAdminRole, btnSignUpStudentRole, btnSignUpLecturerRole, btnSignUp;
     private JPanel signInPanel, signUpPanel;
     private String selectedRole = "Admin";
+    private String selectedSignUpRole = "Admin";
 
     public LoginView() {
         setTitle("Faculty Management System");
-        setSize(900, 500);
+        setSize(1000, 550);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -219,23 +221,115 @@ public class LoginView extends JFrame {
         panel.setBackground(Color.WHITE);
         panel.setLayout(null);
 
-        JLabel lblInfo = new JLabel("Create a new account");
-        lblInfo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        lblInfo.setForeground(Color.GRAY);
-        lblInfo.setBounds(80, 100, 300, 100);
-        lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
+        JLabel lblUsername = new JLabel("Username");
+        lblUsername.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblUsername.setForeground(new Color(138, 78, 255));
+        lblUsername.setBounds(60, 20, 200, 20);
 
-        panel.add(lblInfo);
+        txtSignUpUsername = new JTextField();
+        txtSignUpUsername.setBounds(60, 45, 470, 45);
+        txtSignUpUsername.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        txtSignUpUsername.setForeground(new Color(138, 78, 255));
+        txtSignUpUsername.setBorder(BorderFactory.createCompoundBorder(
+                new RoundedBorder(new Color(138, 78, 255), 3, 10),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
+
+        JLabel lblPassword = new JLabel("Password");
+        lblPassword.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblPassword.setForeground(new Color(138, 78, 255));
+        lblPassword.setBounds(60, 105, 200, 20);
+
+        txtSignUpPassword = new JPasswordField();
+        txtSignUpPassword.setBounds(60, 130, 470, 45);
+        txtSignUpPassword.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        txtSignUpPassword.setForeground(new Color(138, 78, 255));
+        txtSignUpPassword.setBorder(BorderFactory.createCompoundBorder(
+                new RoundedBorder(new Color(138, 78, 255), 3, 10),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
+
+        JLabel lblConfirmPassword = new JLabel("Confirm Password");
+        lblConfirmPassword.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblConfirmPassword.setForeground(new Color(138, 78, 255));
+        lblConfirmPassword.setBounds(60, 190, 200, 20);
+
+        txtConfirmPassword = new JPasswordField();
+        txtConfirmPassword.setBounds(60, 215, 470, 45);
+        txtConfirmPassword.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        txtConfirmPassword.setForeground(new Color(138, 78, 255));
+        txtConfirmPassword.setBorder(BorderFactory.createCompoundBorder(
+                new RoundedBorder(new Color(138, 78, 255), 3, 10),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
+
+        JLabel lblRole = new JLabel("Role");
+        lblRole.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblRole.setForeground(new Color(138, 78, 255));
+        lblRole.setBounds(60, 275, 200, 20);
+
+        btnSignUpAdminRole = createSignUpRoleButton("Admin", 60, 300);
+        btnSignUpStudentRole = createSignUpRoleButton("Student", 215, 300);
+        btnSignUpLecturerRole = createSignUpRoleButton("Lecturer", 370, 300);
+
+        setActiveSignUpRole(btnSignUpAdminRole);
+
+        btnSignUp = new RoundedButton("Sign Up", new Color(138, 78, 255), 15);
+        btnSignUp.setBounds(60, 360, 470, 50);
+        btnSignUp.setForeground(Color.WHITE);
+        btnSignUp.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btnSignUp.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        panel.add(lblUsername);
+        panel.add(txtSignUpUsername);
+        panel.add(lblPassword);
+        panel.add(txtSignUpPassword);
+        panel.add(lblConfirmPassword);
+        panel.add(txtConfirmPassword);
+        panel.add(lblRole);
+        panel.add(btnSignUpAdminRole);
+        panel.add(btnSignUpStudentRole);
+        panel.add(btnSignUpLecturerRole);
+        panel.add(btnSignUp);
 
         return panel;
     }
 
-    /* ================= ROLE BUTTON STYLE ================= */
+    // sign up role button style
+    private JButton createSignUpRoleButton(String text, int x, int y) {
+        RoundedButton btn = new RoundedButton(text, Color.LIGHT_GRAY, 15);
+        btn.setBounds(x, y, 150, 45);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btn.setForeground(Color.WHITE);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        btn.addActionListener(e -> {
+            selectedSignUpRole = text;
+            setActiveSignUpRole(btn);
+        });
+
+        return btn;
+    }
+
+    private void setActiveSignUpRole(JButton selected) {
+        JButton[] buttons = {btnSignUpAdminRole, btnSignUpStudentRole, btnSignUpLecturerRole};
+
+        for (JButton btn : buttons) {
+            btn.setBackground(Color.LIGHT_GRAY);
+            btn.setForeground(Color.WHITE);
+        }
+
+        selected.setBackground(new Color(138, 78, 255));
+        selected.setForeground(Color.WHITE);
+    }
+
+    // role button style
     private JButton createRoleButton(String text, int x, int y) {
         JButton btn = new JButton(text);
         btn.setBounds(x, y, 100, 35);
         btn.setFocusPainted(false);
         btn.setBackground(Color.LIGHT_GRAY);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         btn.addActionListener(e -> {
             selectedRole = text;
