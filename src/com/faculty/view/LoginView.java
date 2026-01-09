@@ -8,6 +8,8 @@ public class LoginView extends JFrame {
     private JTextField txtUsername;
     private JPasswordField txtPassword;
     private JButton btnAdmin, btnStudent, btnLecturer, btnLogin;
+    private JButton btnSignInTab, btnSignUpTab;
+    private JPanel signInPanel, signUpPanel;
     private String selectedRole = "Admin";
 
     public LoginView() {
@@ -88,12 +90,88 @@ public class LoginView extends JFrame {
     private JPanel createRightPanel() {
         JPanel panel = new JPanel();
         panel.setBackground(Color.WHITE);
-        panel.setLayout(null);
+        panel.setLayout(new BorderLayout());
 
-        JLabel lblSignIn = new JLabel("Sign In");
-        lblSignIn.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        lblSignIn.setForeground(new Color(138, 78, 255));
-        lblSignIn.setBounds(80, 30, 200, 30);
+        panel.add(createTabButtons(), BorderLayout.NORTH);
+
+        JPanel contentPanel = new JPanel(new CardLayout());
+        contentPanel.setBackground(Color.WHITE);
+
+        signInPanel = createSignInPanel();
+        signUpPanel = createSignUpPanel();
+
+        contentPanel.add(signInPanel, "SignIn");
+        contentPanel.add(signUpPanel, "SignUp");
+
+        panel.add(contentPanel, BorderLayout.CENTER);
+
+        CardLayout cardLayout = (CardLayout) contentPanel.getLayout();
+        
+        btnSignInTab.addActionListener(e -> {
+            cardLayout.show(contentPanel, "SignIn");
+            setActiveTab(btnSignInTab);
+        });
+
+        btnSignUpTab.addActionListener(e -> {
+            cardLayout.show(contentPanel, "SignUp");
+            setActiveTab(btnSignUpTab);
+        });
+
+        setActiveTab(btnSignInTab);
+
+        return panel;
+    }
+
+    private JPanel createTabButtons() {
+        JPanel tabPanel = new JPanel();
+        tabPanel.setBackground(Color.WHITE);
+        tabPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        tabPanel.setPreferredSize(new Dimension(500, 50));
+
+        btnSignInTab = new JButton("Sign In");
+        btnSignInTab.setPreferredSize(new Dimension(150, 50));
+        btnSignInTab.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btnSignInTab.setFocusPainted(false);
+        btnSignInTab.setBorderPainted(true);
+        btnSignInTab.setContentAreaFilled(true);
+        btnSignInTab.setForeground(Color.BLACK);
+        btnSignInTab.setBackground(Color.WHITE);
+        btnSignInTab.setBorder(null);
+
+        btnSignUpTab = new JButton("Sign Up");
+        btnSignUpTab.setPreferredSize(new Dimension(150, 50));
+        btnSignUpTab.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btnSignUpTab.setFocusPainted(false);
+        btnSignUpTab.setBorderPainted(true);
+        btnSignUpTab.setContentAreaFilled(true);
+        btnSignUpTab.setForeground(Color.BLACK);
+        btnSignUpTab.setBackground(Color.WHITE);
+        btnSignUpTab.setBorder(null);
+
+        tabPanel.add(btnSignInTab);
+        tabPanel.add(btnSignUpTab);
+
+        return tabPanel;
+    }
+
+    private void setActiveTab(JButton selectedTab) {
+        btnSignInTab.setForeground(Color.LIGHT_GRAY);
+        btnSignInTab.setBorder(null);
+        btnSignUpTab.setForeground(Color.LIGHT_GRAY);
+        btnSignUpTab.setBorder(null);
+
+        selectedTab.setForeground(new Color(138, 78, 255));
+        selectedTab.setBorder(BorderFactory.createMatteBorder(0, 0, 3, 0, new Color(138, 78, 255)));
+        
+        btnSignInTab.repaint();
+        btnSignUpTab.repaint();
+    }
+
+    // sign in panel
+    private JPanel createSignInPanel() {
+        JPanel panel = new JPanel();
+        panel.setBackground(Color.WHITE);
+        panel.setLayout(null);
 
         JLabel lblUsername = new JLabel("Username");
         lblUsername.setBounds(80, 90, 200, 20);
@@ -122,7 +200,6 @@ public class LoginView extends JFrame {
         btnLogin.setForeground(Color.WHITE);
         btnLogin.setFocusPainted(false);
 
-        panel.add(lblSignIn);
         panel.add(lblUsername);
         panel.add(txtUsername);
         panel.add(lblPassword);
@@ -132,6 +209,23 @@ public class LoginView extends JFrame {
         panel.add(btnStudent);
         panel.add(btnLecturer);
         panel.add(btnLogin);
+
+        return panel;
+    }
+
+    // sign up panel
+    private JPanel createSignUpPanel() {
+        JPanel panel = new JPanel();
+        panel.setBackground(Color.WHITE);
+        panel.setLayout(null);
+
+        JLabel lblInfo = new JLabel("Create a new account");
+        lblInfo.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblInfo.setForeground(Color.GRAY);
+        lblInfo.setBounds(80, 100, 300, 100);
+        lblInfo.setHorizontalAlignment(SwingConstants.CENTER);
+
+        panel.add(lblInfo);
 
         return panel;
     }
@@ -163,7 +257,6 @@ public class LoginView extends JFrame {
         selected.setForeground(Color.WHITE);
     }
 
-    /* ================= GETTERS FOR CONTROLLER ================= */
     public String getUsername() {
         return txtUsername.getText();
     }
