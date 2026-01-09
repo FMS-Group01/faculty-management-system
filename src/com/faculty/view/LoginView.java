@@ -1,5 +1,6 @@
 package com.faculty.view;
 
+import com.faculty.controller.LoginController;
 import com.faculty.controller.SignUpController;
 
 import javax.swing.*;
@@ -178,36 +179,57 @@ public class LoginView extends JFrame {
         panel.setLayout(null);
 
         JLabel lblUsername = new JLabel("Username");
-        lblUsername.setBounds(80, 90, 200, 20);
+        lblUsername.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblUsername.setForeground(new Color(138, 78, 255));
+        lblUsername.setBounds(60, 20, 200, 20);
 
         txtUsername = new JTextField();
-        txtUsername.setBounds(80, 120, 300, 35);
+        txtUsername.setBounds(60, 45, 470, 45);
+        txtUsername.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        txtUsername.setForeground(new Color(138, 78, 255));
+        txtUsername.setBorder(BorderFactory.createCompoundBorder(
+                new RoundedBorder(new Color(138, 78, 255), 3, 10),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
 
         JLabel lblPassword = new JLabel("Password");
-        lblPassword.setBounds(80, 170, 200, 20);
+        lblPassword.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblPassword.setForeground(new Color(138, 78, 255));
+        lblPassword.setBounds(60, 105, 200, 20);
 
         txtPassword = new JPasswordField();
-        txtPassword.setBounds(80, 200, 300, 35);
+        txtPassword.setBounds(60, 130, 470, 45);
+        txtPassword.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        txtPassword.setForeground(new Color(138, 78, 255));
+        txtPassword.setBorder(BorderFactory.createCompoundBorder(
+                new RoundedBorder(new Color(138, 78, 255), 3, 10),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
 
         JLabel lblRole = new JLabel("Role");
-        lblRole.setBounds(80, 250, 200, 20);
+        lblRole.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblRole.setForeground(new Color(138, 78, 255));
+        lblRole.setBounds(60, 190, 200, 20);
 
-        btnAdmin = createRoleButton("Admin", 80, 280);
-        btnStudent = createRoleButton("Student", 190, 280);
-        btnLecturer = createRoleButton("Lecturer", 300, 280);
+        btnAdmin = createRoleButton("Admin", 60, 220);
+        btnStudent = createRoleButton("Student", 205, 220);
+        btnLecturer = createRoleButton("Lecturer", 350, 220);
 
         setActiveRole(btnAdmin);
 
-        btnLogin = new JButton("Sign In");
-        btnLogin.setBounds(80, 350, 300, 45);
-        btnLogin.setBackground(new Color(138, 78, 255));
+        btnLogin = new RoundedButton("Sign In", new Color(138, 78, 255), 15);
+        btnLogin.setBounds(60, 290, 470, 45);
         btnLogin.setForeground(Color.WHITE);
+        btnLogin.setFont(new Font("Segoe UI", Font.BOLD, 16));
         btnLogin.setFocusPainted(false);
+        btnLogin.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnLogin.addActionListener(e -> handleSignIn());
 
         panel.add(lblUsername);
         panel.add(txtUsername);
         panel.add(lblPassword);
         panel.add(txtPassword);
+        panel.add(Box.createVerticalStrut(250));
         panel.add(lblRole);
         panel.add(btnAdmin);
         panel.add(btnStudent);
@@ -328,10 +350,10 @@ public class LoginView extends JFrame {
 
     // role button style
     private JButton createRoleButton(String text, int x, int y) {
-        JButton btn = new JButton(text);
-        btn.setBounds(x, y, 100, 35);
-        btn.setFocusPainted(false);
-        btn.setBackground(Color.LIGHT_GRAY);
+        RoundedButton btn = new RoundedButton(text, Color.LIGHT_GRAY, 15);
+        btn.setBounds(x, y, 135, 45);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btn.setForeground(Color.WHITE);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         btn.addActionListener(e -> {
@@ -347,7 +369,7 @@ public class LoginView extends JFrame {
 
         for (JButton btn : buttons) {
             btn.setBackground(Color.LIGHT_GRAY);
-            btn.setForeground(Color.BLACK);
+            btn.setForeground(Color.WHITE);
         }
 
         selected.setBackground(new Color(138, 78, 255));
@@ -381,6 +403,20 @@ public class LoginView extends JFrame {
         
         if (success) {
             clearSignUpFields();
+            this.dispose();
+            new HomeView();
+        }
+    }
+    
+    private void handleSignIn() {
+        String username = txtUsername.getText().trim();
+        String password = String.valueOf(txtPassword.getPassword());
+        String role = selectedRole.toUpperCase();
+        
+        LoginController controller = new LoginController();
+        boolean success = controller.login(username, password, role);
+        
+        if (success) {
             this.dispose();
             new HomeView();
         }
