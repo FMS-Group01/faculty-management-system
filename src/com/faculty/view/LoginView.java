@@ -405,5 +405,4 @@ public class LoginView extends JFrame {
         selectedSignUpRole = "Admin";
         setActiveSignUpRole(btnSignUpAdminRole);
     }
-//    test
 }
