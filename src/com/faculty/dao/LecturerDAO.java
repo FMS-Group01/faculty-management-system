@@ -2,15 +2,10 @@ package com.faculty.dao;
 
 import com.faculty.model.Lecturer;
 import com.faculty.util.DatabaseConnection;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * LecturerDAO - Data Access Object for Lecturer operations
- * Handles all database operations related to lecturers
- */
 public class LecturerDAO {
     
     private Connection connection;
@@ -19,11 +14,6 @@ public class LecturerDAO {
         this.connection = DatabaseConnection.getInstance().getConnection();
     }
     
-    /**
-     * Create a new lecturer in the database
-     * @param lecturer Lecturer object to create
-     * @return generated lecturer ID, or -1 if failed
-     */
     public int createLecturer(Lecturer lecturer) {
         String sql = "INSERT INTO lecturers (user_id, name, email, mobile, department_id) VALUES (?, ?, ?, ?, ?)";
         
@@ -55,11 +45,6 @@ public class LecturerDAO {
         return -1;
     }
     
-    /**
-     * Get lecturer by lecturer ID
-     * @param lecturerId lecturer ID to search for
-     * @return Lecturer object or null if not found
-     */
     public Lecturer getLecturerById(int lecturerId) {
         String sql = "SELECT * FROM lecturers WHERE lecturer_id = ?";
         
@@ -78,11 +63,6 @@ public class LecturerDAO {
         return null;
     }
     
-    /**
-     * Get lecturer by user ID
-     * @param userId user ID to search for
-     * @return Lecturer object or null if not found
-     */
     public Lecturer getLecturerByUserId(int userId) {
         String sql = "SELECT * FROM lecturers WHERE user_id = ?";
         
@@ -101,10 +81,6 @@ public class LecturerDAO {
         return null;
     }
     
-    /**
-     * Get all lecturers
-     * @return List of all lecturers
-     */
     public List<Lecturer> getAllLecturers() {
         List<Lecturer> lecturers = new ArrayList<>();
         String sql = "SELECT * FROM lecturers ORDER BY created_at DESC";
@@ -122,11 +98,6 @@ public class LecturerDAO {
         return lecturers;
     }
     
-    /**
-     * Update lecturer information
-     * @param lecturer Lecturer object with updated information
-     * @return true if update successful, false otherwise
-     */
     public boolean updateLecturer(Lecturer lecturer) {
         String sql = "UPDATE lecturers SET name = ?, email = ?, mobile = ?, department_id = ? WHERE lecturer_id = ?";
         
@@ -152,11 +123,6 @@ public class LecturerDAO {
         return false;
     }
     
-    /**
-     * Delete lecturer by lecturer ID
-     * @param lecturerId lecturer ID to delete
-     * @return true if deletion successful, false otherwise
-     */
     public boolean deleteLecturer(int lecturerId) {
         String sql = "DELETE FROM lecturers WHERE lecturer_id = ?";
         
@@ -172,11 +138,6 @@ public class LecturerDAO {
         return false;
     }
     
-    /**
-     * Check if email already exists
-     * @param email email to check
-     * @return true if exists, false otherwise
-     */
     public boolean emailExists(String email) {
         String sql = "SELECT COUNT(*) FROM lecturers WHERE email = ?";
         
@@ -195,12 +156,6 @@ public class LecturerDAO {
         return false;
     }
     
-    /**
-     * Extract Lecturer object from ResultSet
-     * @param rs ResultSet containing lecturer data
-     * @return Lecturer object
-     * @throws SQLException if error occurs while reading ResultSet
-     */
     private Lecturer extractLecturerFromResultSet(ResultSet rs) throws SQLException {
         Integer departmentId = rs.getInt("department_id");
         if (rs.wasNull()) {
