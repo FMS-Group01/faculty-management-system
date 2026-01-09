@@ -13,7 +13,7 @@ public class DatabaseConnection {
     // Database credentials - Update these with your MySQL settings
     private static final String URL = "jdbc:mysql://localhost:3306/faculty_management_db";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "12345678"; // Update with your MySQL password
+    private static final String PASSWORD = "Voxy@1903cc"; // Update with your MySQL password
     
     private static DatabaseConnection instance;
     private Connection connection;
