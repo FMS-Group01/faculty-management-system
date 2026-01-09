@@ -374,24 +374,18 @@ public class LoginView extends JFrame {
      * Handle sign up button click
      */
     private void handleSignUp() {
-        // Get input values
         String username = txtSignUpUsername.getText().trim();
         String password = String.valueOf(txtSignUpPassword.getPassword());
         String confirmPassword = String.valueOf(txtConfirmPassword.getPassword());
         String role = selectedSignUpRole.toUpperCase();
         
-        // Create controller and process sign up
         SignUpController controller = new SignUpController();
         boolean success = controller.signUp(username, password, confirmPassword, role);
         
-        // If sign up successful, clear fields and switch to sign in tab
         if (success) {
             clearSignUpFields();
-            // Optionally switch to sign in tab
-            // You can uncomment the following lines if you want to auto-switch to sign in
-            // CardLayout cardLayout = (CardLayout) signInPanel.getParent().getLayout();
-            // cardLayout.show(signInPanel.getParent(), "SignIn");
-            // setActiveTab(btnSignInTab);
+            this.dispose();
+            new HomeView();
         }
     }
     
