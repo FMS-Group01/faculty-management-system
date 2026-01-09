@@ -1,5 +1,7 @@
 package com.faculty.view;
 
+import com.faculty.controller.SignUpController;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -279,10 +281,7 @@ public class LoginView extends JFrame {
         btnSignUp.setForeground(Color.WHITE);
         btnSignUp.setFont(new Font("Segoe UI", Font.BOLD, 16));
         btnSignUp.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnSignUp.addActionListener(e -> {
-            dispose();
-            new HomeView();
-        });
+        btnSignUp.addActionListener(e -> handleSignUp());
 
         panel.add(lblUsername);
         panel.add(txtSignUpUsername);
@@ -369,5 +368,41 @@ public class LoginView extends JFrame {
 
     public JButton getLoginButton() {
         return btnLogin;
+    }
+    
+    /**
+     * Handle sign up button click
+     */
+    private void handleSignUp() {
+        // Get input values
+        String username = txtSignUpUsername.getText().trim();
+        String password = String.valueOf(txtSignUpPassword.getPassword());
+        String confirmPassword = String.valueOf(txtConfirmPassword.getPassword());
+        String role = selectedSignUpRole.toUpperCase();
+        
+        // Create controller and process sign up
+        SignUpController controller = new SignUpController();
+        boolean success = controller.signUp(username, password, confirmPassword, role);
+        
+        // If sign up successful, clear fields and switch to sign in tab
+        if (success) {
+            clearSignUpFields();
+            // Optionally switch to sign in tab
+            // You can uncomment the following lines if you want to auto-switch to sign in
+            // CardLayout cardLayout = (CardLayout) signInPanel.getParent().getLayout();
+            // cardLayout.show(signInPanel.getParent(), "SignIn");
+            // setActiveTab(btnSignInTab);
+        }
+    }
+    
+    /**
+     * Clear sign up form fields
+     */
+    private void clearSignUpFields() {
+        txtSignUpUsername.setText("");
+        txtSignUpPassword.setText("");
+        txtConfirmPassword.setText("");
+        selectedSignUpRole = "Admin";
+        setActiveSignUpRole(btnSignUpAdminRole);
     }
 }
