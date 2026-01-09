@@ -279,6 +279,10 @@ public class LoginView extends JFrame {
         btnSignUp.setForeground(Color.WHITE);
         btnSignUp.setFont(new Font("Segoe UI", Font.BOLD, 16));
         btnSignUp.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnSignUp.addActionListener(e -> {
+            dispose();
+            new HomeView();
+        });
 
         panel.add(lblUsername);
         panel.add(txtSignUpUsername);
