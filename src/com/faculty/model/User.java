@@ -2,10 +2,6 @@ package com.faculty.model;
 
 import java.sql.Timestamp;
 
-/**
- * User Model Class
- * Represents a system user with authentication credentials and role
- */
 public class User {
     private int userId;
     private String username;
@@ -13,7 +9,6 @@ public class User {
     private String role; // ADMIN, STUDENT, LECTURER
     private Timestamp createdAt;
 
-    // Constructors
     public User() {
     }
 
@@ -31,7 +26,6 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    // Getters and Setters
     public int getUserId() {
         return userId;
     }

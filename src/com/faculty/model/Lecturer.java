@@ -2,10 +2,6 @@ package com.faculty.model;
 
 import java.sql.Timestamp;
 
-/**
- * Lecturer Model Class
- * Represents a lecturer in the faculty management system
- */
 public class Lecturer {
     private int lecturerId;
     private int userId;
@@ -15,7 +11,6 @@ public class Lecturer {
     private Integer departmentId;
     private Timestamp createdAt;
 
-    // Constructors
     public Lecturer() {
     }
 
@@ -43,7 +38,6 @@ public class Lecturer {
         this.createdAt = createdAt;
     }
 
-    // Getters and Setters
     public int getLecturerId() {
         return lecturerId;
     }

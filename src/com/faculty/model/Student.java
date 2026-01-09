@@ -2,10 +2,6 @@ package com.faculty.model;
 
 import java.sql.Timestamp;
 
-/**
- * Student Model Class
- * Represents a student in the faculty management system
- */
 public class Student {
     private String studentId;
     private int userId;
@@ -15,7 +11,6 @@ public class Student {
     private Integer degreeId;
     private Timestamp createdAt;
 
-    // Constructors
     public Student() {
     }
 
@@ -43,7 +38,6 @@ public class Student {
         this.createdAt = createdAt;
     }
 
-    // Getters and Setters
     public String getStudentId() {
         return studentId;
     }

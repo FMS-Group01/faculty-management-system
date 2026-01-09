@@ -369,10 +369,7 @@ public class LoginView extends JFrame {
     public JButton getLoginButton() {
         return btnLogin;
     }
-    
-    /**
-     * Handle sign up button click
-     */
+
     private void handleSignUp() {
         String username = txtSignUpUsername.getText().trim();
         String password = String.valueOf(txtSignUpPassword.getPassword());
@@ -389,9 +386,6 @@ public class LoginView extends JFrame {
         }
     }
     
-    /**
-     * Clear sign up form fields
-     */
     private void clearSignUpFields() {
         txtSignUpUsername.setText("");
         txtSignUpPassword.setText("");
