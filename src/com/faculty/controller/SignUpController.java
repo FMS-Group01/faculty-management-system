@@ -12,16 +12,16 @@ public class SignUpController {
         this.userDAO = new UserDAO();
     }
     
-    public boolean signUp(String username, String password, String confirmPassword, String role) {
+    public String signUp(String username, String password, String confirmPassword, String role) {
         String validationError = validateSignUpInput(username, password, confirmPassword, role);
         if (validationError != null) {
             JOptionPane.showMessageDialog(null, validationError, "Sign Up Error", JOptionPane.ERROR_MESSAGE);
-            return false;
+            return null;
         }
         
         if (userDAO.usernameExists(username)) {
             JOptionPane.showMessageDialog(null, "Username already exists! Please choose another.", "Sign Up Error", JOptionPane.ERROR_MESSAGE);
-            return false;
+            return null;
         }
         
         try {
@@ -33,15 +33,15 @@ public class SignUpController {
                     "Account created successfully!\nYou can now log in.", 
                     "Sign Up Successful", 
                     JOptionPane.INFORMATION_MESSAGE);
-                return true;
+                return role.toUpperCase();
             } else {
                 JOptionPane.showMessageDialog(null, "Failed to create account!", "Sign Up Error", JOptionPane.ERROR_MESSAGE);
-                return false;
+                return null;
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Sign up failed: " + e.getMessage(), "Sign Up Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
     

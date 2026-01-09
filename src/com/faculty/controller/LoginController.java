@@ -12,27 +12,27 @@ public class LoginController {
         this.userDAO = new UserDAO();
     }
     
-    public boolean login(String username, String password, String role) {
+    public User login(String username, String password, String role) {
         String validationError = validateLoginInput(username, password, role);
         if (validationError != null) {
             JOptionPane.showMessageDialog(null, validationError, "Login Error", JOptionPane.ERROR_MESSAGE);
-            return false;
+            return null;
         }
         
         User user = userDAO.authenticateUser(username, password);
         
         if (user == null) {
             JOptionPane.showMessageDialog(null, "Invalid username or password!", "Login Error", JOptionPane.ERROR_MESSAGE);
-            return false;
+            return null;
         }
         
         if (!user.getRole().equalsIgnoreCase(role)) {
             JOptionPane.showMessageDialog(null, "Invalid role selected!\nYou are registered as: " + user.getRole(), "Login Error", JOptionPane.ERROR_MESSAGE);
-            return false;
+            return null;
         }
         
         JOptionPane.showMessageDialog(null, "Login successful!\nWelcome, " + username + "!", "Login Successful", JOptionPane.INFORMATION_MESSAGE);
-        return true;
+        return user;
     }
     
     private String validateLoginInput(String username, String password, String role) {

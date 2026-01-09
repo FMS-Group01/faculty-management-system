@@ -2,6 +2,7 @@ package com.faculty.view;
 
 import com.faculty.controller.LoginController;
 import com.faculty.controller.SignUpController;
+import com.faculty.model.User;
 
 import javax.swing.*;
 import java.awt.*;
@@ -399,12 +400,18 @@ public class LoginView extends JFrame {
         String role = selectedSignUpRole.toUpperCase();
         
         SignUpController controller = new SignUpController();
-        boolean success = controller.signUp(username, password, confirmPassword, role);
+        String userRole = controller.signUp(username, password, confirmPassword, role);
         
-        if (success) {
+        if (userRole != null) {
             clearSignUpFields();
-            this.dispose();
-            new HomeView();
+            
+            if (userRole.equals("ADMIN")) {
+                this.dispose();
+                new AdminDashboardView();
+            } else if (userRole.equals("STUDENT")) {
+                this.dispose();
+                new StudentDashboardView();
+            }
         }
     }
     
@@ -414,11 +421,16 @@ public class LoginView extends JFrame {
         String role = selectedRole.toUpperCase();
         
         LoginController controller = new LoginController();
-        boolean success = controller.login(username, password, role);
+        User user = controller.login(username, password, role);
         
-        if (success) {
-            this.dispose();
-            new HomeView();
+        if (user != null) {
+            if (user.getRole().equals("ADMIN")) {
+                this.dispose();
+                new AdminDashboardView();
+            } else if (user.getRole().equals("STUDENT")) {
+                this.dispose();
+                new StudentDashboardView();
+            }
         }
     }
     
