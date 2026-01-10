@@ -6,6 +6,7 @@ import com.faculty.view.StudentsPanel;
 import com.faculty.view.LecturersPanel;
 import com.faculty.view.CoursesPanel;
 import com.faculty.view.DepartmentsPanel;
+import com.faculty.view.DegreesPanel;
 
 
 public class AdminDashboardView extends JFrame {
@@ -19,6 +20,7 @@ public class AdminDashboardView extends JFrame {
     private LecturersPanel lecturersPanel;
     private CoursesPanel coursesPanel;
     private DepartmentsPanel departmentsPanel;
+    private DegreesPanel degreesPanel;
 
 
     private final Color PURPLE = new Color(138, 78, 255);
@@ -41,12 +43,13 @@ public class AdminDashboardView extends JFrame {
         lecturersPanel = new LecturersPanel();
         coursesPanel = new CoursesPanel();
         departmentsPanel = new DepartmentsPanel();
-
+        degreesPanel = new DegreesPanel();
 
         contentPanel.add(studentsPanel, "Students");
         contentPanel.add(lecturersPanel, "Lecturers");
         contentPanel.add(coursesPanel, "Courses");
         contentPanel.add(departmentsPanel, "Departments");
+        contentPanel.add(degreesPanel, "Degrees");
 
 
         add(contentPanel, BorderLayout.CENTER);
@@ -130,7 +133,7 @@ public class AdminDashboardView extends JFrame {
             case "Students" -> studentsPanel.loadStudentsData();
             case "Lecturers" -> lecturersPanel.loadLecturersData();
             case "Courses" -> coursesPanel.loadCoursesData();
-            case "Departments" -> departmentsPanel.loadDepartmentsData();
+            case "Degrees" -> degreesPanel.loadDegreesData();            case "Departments" -> departmentsPanel.loadDepartmentsData();
 
         }
     }
