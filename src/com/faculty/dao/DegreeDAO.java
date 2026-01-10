@@ -8,14 +8,16 @@ import java.util.List;
 
 public class DegreeDAO {
     
+    private Connection connection;
+    
     public DegreeDAO() {
+        this.connection = DatabaseConnection.getInstance().getConnection();
     }
 
     public int createDegree(Degree degree) {
         String query = "INSERT INTO degrees (name, department_id) VALUES (?, ?)";
         
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             
             pstmt.setString(1, degree.getName());
             if (degree.getDepartmentId() != null) {
@@ -44,8 +46,7 @@ public class DegreeDAO {
         List<Degree> degrees = new ArrayList<>();
         String query = "SELECT * FROM degrees ORDER BY degree_id";
         
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             Statement stmt = conn.createStatement();
+        try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             
             while (rs.next()) {
@@ -69,8 +70,7 @@ public class DegreeDAO {
     public Degree getDegreeById(int degreeId) {
         String query = "SELECT * FROM degrees WHERE degree_id = ?";
         
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             
             pstmt.setInt(1, degreeId);
             ResultSet rs = pstmt.executeQuery();
@@ -96,8 +96,7 @@ public class DegreeDAO {
     public boolean updateDegree(Degree degree) {
         String query = "UPDATE degrees SET name = ?, department_id = ? WHERE degree_id = ?";
         
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             
             pstmt.setString(1, degree.getName());
             if (degree.getDepartmentId() != null) {
@@ -118,8 +117,7 @@ public class DegreeDAO {
     public boolean deleteDegree(int degreeId) {
         String query = "DELETE FROM degrees WHERE degree_id = ?";
         
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             
             pstmt.setInt(1, degreeId);
             return pstmt.executeUpdate() > 0;
@@ -137,8 +135,7 @@ public class DegreeDAO {
         
         String query = "SELECT degree_id FROM degrees WHERE TRIM(LOWER(name)) = TRIM(LOWER(?))";
         
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             
             pstmt.setString(1, degreeName.trim());
             ResultSet rs = pstmt.executeQuery();
@@ -161,8 +158,7 @@ public class DegreeDAO {
         
         String query = "SELECT name FROM degrees WHERE degree_id = ?";
         
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             
             pstmt.setInt(1, degreeId);
             ResultSet rs = pstmt.executeQuery();
