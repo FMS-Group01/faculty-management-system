@@ -2,6 +2,7 @@ package com.faculty.controller;
 
 import com.faculty.dao.StudentDAO;
 import com.faculty.dao.UserDAO;
+import com.faculty.dao.DegreeDAO;
 import com.faculty.model.Student;
 import com.faculty.model.User;
 
@@ -12,10 +13,12 @@ public class StudentController {
     
     private StudentDAO studentDAO;
     private UserDAO userDAO;
+    private DegreeDAO degreeDAO;
     
     public StudentController() {
         this.studentDAO = new StudentDAO();
         this.userDAO = new UserDAO();
+        this.degreeDAO = new DegreeDAO();
     }
     
     public List<Student> getAllStudents() {
@@ -31,11 +34,28 @@ public class StudentController {
     }
     
     public boolean createStudent(String studentId, String name, String email, String mobile, 
-                                  String username, String password) {
+                                  String username, String password, Integer degreeId) {
         String validationError = validateStudentInput(studentId, name, email, mobile, username, password);
         if (validationError != null) {
             JOptionPane.showMessageDialog(null, validationError, "Validation Error", JOptionPane.ERROR_MESSAGE);
             return false;
+        }
+        
+        // Validate degree exists if provided
+        if (degreeId != null) {
+            try {
+                String degreeName = degreeDAO.getDegreeNameById(degreeId);
+                if (degreeName == null) {
+                    JOptionPane.showMessageDialog(null, 
+                        "Degree ID " + degreeId + " does not exist! Please create the degree first or leave blank.", 
+                        "Validation Error", 
+                        JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Error validating degree: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
         }
         
         if (studentDAO.studentIdExists(studentId)) {
@@ -59,7 +79,7 @@ public class StudentController {
             int userId = userDAO.createUser(user);
             
             if (userId > 0) {
-                Student student = new Student(studentId, userId, name, email, mobile, null);
+                Student student = new Student(studentId, userId, name, email, mobile, degreeId);
                 boolean success = studentDAO.createStudent(student);
                 
                 if (success) {
@@ -87,11 +107,28 @@ public class StudentController {
         }
     }
     
-    public boolean updateStudent(String studentId, String name, String email, String mobile) {
+    public boolean updateStudent(String studentId, String name, String email, String mobile, Integer degreeId) {
         String validationError = validateUpdateInput(name, email, mobile);
         if (validationError != null) {
             JOptionPane.showMessageDialog(null, validationError, "Validation Error", JOptionPane.ERROR_MESSAGE);
             return false;
+        }
+        
+        // Validate degree exists if provided
+        if (degreeId != null) {
+            try {
+                String degreeName = degreeDAO.getDegreeNameById(degreeId);
+                if (degreeName == null) {
+                    JOptionPane.showMessageDialog(null, 
+                        "Degree ID " + degreeId + " does not exist! Please create the degree first or leave blank.", 
+                        "Validation Error", 
+                        JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Error validating degree: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
         }
         
         try {
@@ -108,6 +145,7 @@ public class StudentController {
             student.setName(name);
             student.setEmail(email);
             student.setMobile(mobile);
+            student.setDegreeId(degreeId);
             
             boolean success = studentDAO.updateStudent(student);
             

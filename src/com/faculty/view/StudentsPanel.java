@@ -1,6 +1,7 @@
 package com.faculty.view;
 
 import com.faculty.controller.StudentController;
+import com.faculty.dao.DegreeDAO;
 import com.faculty.model.Student;
 
 import javax.swing.*;
@@ -13,11 +14,13 @@ public class StudentsPanel extends JPanel {
     private JTable studentsTable;
     private DefaultTableModel tableModel;
     private StudentController studentController;
+    private DegreeDAO degreeDAO;
     private final Color PURPLE = new Color(138, 78, 255);
     private final Color LIGHT_GRAY = new Color(220, 220, 220);
     
     public StudentsPanel() {
         studentController = new StudentController();
+        degreeDAO = new DegreeDAO();
         
         setLayout(null);
         setBackground(Color.WHITE);
@@ -94,7 +97,12 @@ public class StudentsPanel extends JPanel {
         
         if (students != null) {
             for (Student student : students) {
-                String degreeName = student.getDegreeId() != null ? "Degree #" + student.getDegreeId() : "N/A";
+                String degreeName = "N/A";
+                if (student.getDegreeId() != null) {
+                    String name = degreeDAO.getDegreeNameById(student.getDegreeId());
+                    degreeName = name != null ? name : "N/A";
+                }
+                
                 tableModel.addRow(new Object[]{
                     student.getName() != null ? student.getName() : "N/A",
                     student.getStudentId(),
@@ -111,6 +119,7 @@ public class StudentsPanel extends JPanel {
         JTextField txtName = new JTextField();
         JTextField txtEmail = new JTextField();
         JTextField txtMobile = new JTextField();
+        JTextField txtDegreeId = new JTextField();
         JTextField txtUsername = new JTextField();
         JPasswordField txtPassword = new JPasswordField();
         
@@ -119,6 +128,7 @@ public class StudentsPanel extends JPanel {
             "Full Name:", txtName,
             "Email:", txtEmail,
             "Mobile:", txtMobile,
+            "Degree ID (optional):", txtDegreeId,
             "Username:", txtUsername,
             "Password:", txtPassword
         };
@@ -130,13 +140,23 @@ public class StudentsPanel extends JPanel {
             String name = txtName.getText().trim();
             String email = txtEmail.getText().trim();
             String mobile = txtMobile.getText().trim();
+            String degreeIdStr = txtDegreeId.getText().trim();
             String username = txtUsername.getText().trim();
             String password = String.valueOf(txtPassword.getPassword());
             
-            boolean success = studentController.createStudent(studentId, name, email, mobile, username, password);
-            
-            if (success) {
-                loadStudentsData();
+            try {
+                Integer degreeId = null;
+                if (!degreeIdStr.isEmpty()) {
+                    degreeId = Integer.parseInt(degreeIdStr);
+                }
+                
+                boolean success = studentController.createStudent(studentId, name, email, mobile, username, password, degreeId);
+                
+                if (success) {
+                    loadStudentsData();
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Degree ID must be a number!", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -158,11 +178,13 @@ public class StudentsPanel extends JPanel {
         JTextField txtName = new JTextField(student.getName());
         JTextField txtEmail = new JTextField(student.getEmail());
         JTextField txtMobile = new JTextField(student.getMobile());
+        JTextField txtDegreeId = new JTextField(student.getDegreeId() != null ? String.valueOf(student.getDegreeId()) : "");
         
         Object[] message = {
             "Full Name:", txtName,
             "Email:", txtEmail,
-            "Mobile:", txtMobile
+            "Mobile:", txtMobile,
+            "Degree ID (optional):", txtDegreeId
         };
         
         int option = JOptionPane.showConfirmDialog(this, message, "Edit Student", JOptionPane.OK_CANCEL_OPTION);
@@ -171,11 +193,21 @@ public class StudentsPanel extends JPanel {
             String name = txtName.getText().trim();
             String email = txtEmail.getText().trim();
             String mobile = txtMobile.getText().trim();
+            String degreeIdStr = txtDegreeId.getText().trim();
             
-            boolean success = studentController.updateStudent(studentId, name, email, mobile);
-            
-            if (success) {
-                loadStudentsData();
+            try {
+                Integer degreeId = null;
+                if (!degreeIdStr.isEmpty()) {
+                    degreeId = Integer.parseInt(degreeIdStr);
+                }
+                
+                boolean success = studentController.updateStudent(studentId, name, email, mobile, degreeId);
+                
+                if (success) {
+                    loadStudentsData();
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Degree ID must be a number!", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
