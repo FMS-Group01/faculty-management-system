@@ -11,6 +11,8 @@ import com.faculty.util.DatabaseConnection;
 
 public class StudentDashboardView extends JFrame {
 
+    private final Color PURPLE = new Color(138, 78, 255);
+
     public StudentDashboardView(String username) {
         setTitle("Faculty Management System - Student Dashboard");
         setSize(1100, 700);
@@ -138,24 +140,16 @@ public class StudentDashboardView extends JFrame {
         sidebar.add(menuPanel);
         sidebar.add(Box.createVerticalGlue());
 
-        // Create logout button at the bottom
-        JButton logoutButton = new JButton("Logout");
-        logoutButton.setBackground(Color.WHITE);
-        logoutButton.setForeground(new Color(138, 78, 255));
-        logoutButton.setFont(new Font("Arial", Font.BOLD, 14));
-        logoutButton.setPreferredSize(new Dimension(75, 48));
-        logoutButton.setMaximumSize(new Dimension(75, 48));
+        JButton logoutButton = new RoundedButton("Logout", Color.WHITE, 25);
+        logoutButton.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        logoutButton.setForeground(PURPLE);
+        logoutButton.setPreferredSize(new Dimension(150, 60));
+        logoutButton.setMaximumSize(new Dimension(150, 60));
         logoutButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        logoutButton.setFocusPainted(false);
-        logoutButton.setBorderPainted(true);
-        logoutButton.setBorder(BorderFactory.createLineBorder(new Color(138, 78, 255), 2));
         logoutButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         logoutButton.addActionListener(e -> {
-            dispose();
-            SwingUtilities.invokeLater(() -> {
-                LoginView loginView = new LoginView();
-                loginView.setVisible(true);
-            });
+            this.dispose();
+            new LoginView().setVisible(true);
         });
 
         sidebar.add(logoutButton);
