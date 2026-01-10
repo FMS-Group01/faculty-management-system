@@ -1,9 +1,7 @@
 package com.faculty.view;
 
-import com.faculty.dao.StudentDAO;
-import com.faculty.dao.UserDAO;
+import com.faculty.controller.StudentController;
 import com.faculty.model.Student;
-import com.faculty.model.User;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -14,14 +12,12 @@ public class StudentsPanel extends JPanel {
     
     private JTable studentsTable;
     private DefaultTableModel tableModel;
-    private StudentDAO studentDAO;
-    private UserDAO userDAO;
+    private StudentController studentController;
     private final Color PURPLE = new Color(138, 78, 255);
     private final Color LIGHT_GRAY = new Color(220, 220, 220);
     
     public StudentsPanel() {
-        studentDAO = new StudentDAO();
-        userDAO = new UserDAO();
+        studentController = new StudentController();
         
         setLayout(null);
         setBackground(Color.WHITE);
@@ -94,17 +90,19 @@ public class StudentsPanel extends JPanel {
     
     public void loadStudentsData() {
         tableModel.setRowCount(0);
-        List<Student> students = studentDAO.getAllStudents();
+        List<Student> students = studentController.getAllStudents();
         
-        for (Student student : students) {
-            String degreeName = student.getDegreeId() != null ? "Degree #" + student.getDegreeId() : "N/A";
-            tableModel.addRow(new Object[]{
-                student.getName() != null ? student.getName() : "N/A",
-                student.getStudentId(),
-                degreeName,
-                student.getEmail() != null ? student.getEmail() : "N/A",
-                student.getMobile() != null ? student.getMobile() : "N/A"
-            });
+        if (students != null) {
+            for (Student student : students) {
+                String degreeName = student.getDegreeId() != null ? "Degree #" + student.getDegreeId() : "N/A";
+                tableModel.addRow(new Object[]{
+                    student.getName() != null ? student.getName() : "N/A",
+                    student.getStudentId(),
+                    degreeName,
+                    student.getEmail() != null ? student.getEmail() : "N/A",
+                    student.getMobile() != null ? student.getMobile() : "N/A"
+                });
+            }
         }
     }
     
@@ -135,30 +133,10 @@ public class StudentsPanel extends JPanel {
             String username = txtUsername.getText().trim();
             String password = String.valueOf(txtPassword.getPassword());
             
-            if (studentId.isEmpty() || username.isEmpty() || password.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Student ID, Username and Password are required!", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+            boolean success = studentController.createStudent(studentId, name, email, mobile, username, password);
             
-            if (studentDAO.studentIdExists(studentId)) {
-                JOptionPane.showMessageDialog(this, "Student ID already exists!", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            
-            User user = new User(username, password, "STUDENT");
-            int userId = userDAO.createUser(user);
-            
-            if (userId > 0) {
-                Student student = new Student(studentId, userId, name, email, mobile, null);
-                boolean success = studentDAO.createStudent(student);
-                
-                if (success) {
-                    JOptionPane.showMessageDialog(this, "Student added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    loadStudentsData();
-                } else {
-                    userDAO.deleteUser(userId);
-                    JOptionPane.showMessageDialog(this, "Failed to add student!", "Error", JOptionPane.ERROR_MESSAGE);
-                }
+            if (success) {
+                loadStudentsData();
             }
         }
     }
@@ -171,10 +149,9 @@ public class StudentsPanel extends JPanel {
         }
         
         String studentId = (String) tableModel.getValueAt(selectedRow, 1);
-        Student student = studentDAO.getStudentById(studentId);
+        Student student = studentController.getStudentById(studentId);
         
         if (student == null) {
-            JOptionPane.showMessageDialog(this, "Student not found!", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
@@ -191,17 +168,14 @@ public class StudentsPanel extends JPanel {
         int option = JOptionPane.showConfirmDialog(this, message, "Edit Student", JOptionPane.OK_CANCEL_OPTION);
         
         if (option == JOptionPane.OK_OPTION) {
-            student.setName(txtName.getText().trim());
-            student.setEmail(txtEmail.getText().trim());
-            student.setMobile(txtMobile.getText().trim());
+            String name = txtName.getText().trim();
+            String email = txtEmail.getText().trim();
+            String mobile = txtMobile.getText().trim();
             
-            boolean success = studentDAO.updateStudent(student);
+            boolean success = studentController.updateStudent(studentId, name, email, mobile);
             
             if (success) {
-                JOptionPane.showMessageDialog(this, "Student updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 loadStudentsData();
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to update student!", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -215,20 +189,10 @@ public class StudentsPanel extends JPanel {
         
         String studentId = (String) tableModel.getValueAt(selectedRow, 1);
         
-        int confirm = JOptionPane.showConfirmDialog(this, 
-            "Are you sure you want to delete this student?", 
-            "Confirm Delete", 
-            JOptionPane.YES_NO_OPTION);
+        boolean success = studentController.deleteStudent(studentId);
         
-        if (confirm == JOptionPane.YES_OPTION) {
-            boolean success = studentDAO.deleteStudent(studentId);
-            
-            if (success) {
-                JOptionPane.showMessageDialog(this, "Student deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadStudentsData();
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to delete student!", "Error", JOptionPane.ERROR_MESSAGE);
-            }
+        if (success) {
+            loadStudentsData();
         }
     }
     

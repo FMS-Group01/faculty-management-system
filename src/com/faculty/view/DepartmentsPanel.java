@@ -1,6 +1,6 @@
 package com.faculty.view;
 
-import com.faculty.dao.DepartmentDAO;
+import com.faculty.controller.DepartmentController;
 import com.faculty.model.Department;
 
 import javax.swing.*;
@@ -10,15 +10,15 @@ import java.util.List;
 
 public class DepartmentsPanel extends JPanel {
 
-    private JTable table;
+    private JTable departmentsTable;
     private DefaultTableModel tableModel;
-    private DepartmentDAO departmentDAO;
-
+    private DepartmentController departmentController;
     private final Color PURPLE = new Color(138, 78, 255);
     private final Color LIGHT_GRAY = new Color(220, 220, 220);
 
     public DepartmentsPanel() {
-        departmentDAO = new DepartmentDAO();
+        departmentController = new DepartmentController();
+
         setLayout(null);
         setBackground(Color.WHITE);
 
@@ -27,19 +27,19 @@ public class DepartmentsPanel extends JPanel {
     }
 
     private void initializeComponents() {
-        JLabel title = new JLabel("Departments");
-        title.setFont(new Font("Segoe UI", Font.BOLD, 36));
-        title.setForeground(PURPLE);
-        title.setBounds(50, 30, 300, 50);
-        add(title);
+        JLabel titleLabel = new JLabel("Departments");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 36));
+        titleLabel.setForeground(PURPLE);
+        titleLabel.setBounds(50, 30, 300, 50);
+        add(titleLabel);
 
-        JButton btnAdd = new RoundedButton("Add New", PURPLE, 15);
-        btnAdd.setBounds(50, 100, 150, 45);
-        btnAdd.setForeground(Color.WHITE);
-        btnAdd.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnAdd.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnAdd.addActionListener(e -> addDepartment());
-        add(btnAdd);
+        JButton btnAddNew = new RoundedButton("Add new", PURPLE, 15);
+        btnAddNew.setBounds(50, 100, 150, 45);
+        btnAddNew.setForeground(Color.WHITE);
+        btnAddNew.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btnAddNew.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnAddNew.addActionListener(e -> addNewDepartment());
+        add(btnAddNew);
 
         JButton btnEdit = new RoundedButton("Edit", LIGHT_GRAY, 15);
         btnEdit.setBounds(220, 100, 150, 45);
@@ -57,117 +57,129 @@ public class DepartmentsPanel extends JPanel {
         btnDelete.addActionListener(e -> deleteDepartment());
         add(btnDelete);
 
-        String[] columns = {"Department ID", "Name", "HOD"};
+        String[] columns = {"Department ID", "Name", "Head of Department"};
         tableModel = new DefaultTableModel(columns, 0) {
-            @Override public boolean isCellEditable(int row, int column) { return false; }
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
         };
-        table = new JTable(tableModel);
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        table.setRowHeight(40);
-        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
-        table.getTableHeader().setForeground(PURPLE);
-        table.getTableHeader().setBackground(Color.WHITE);
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.setGridColor(PURPLE);
 
-        JScrollPane scroll = new JScrollPane(table);
-        scroll.setBounds(50, 170, 700, 350);
-        scroll.setBorder(BorderFactory.createLineBorder(PURPLE, 2));
-        add(scroll);
+        departmentsTable = new JTable(tableModel);
+        departmentsTable.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        departmentsTable.setRowHeight(40);
+        departmentsTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
+        departmentsTable.getTableHeader().setForeground(PURPLE);
+        departmentsTable.getTableHeader().setBackground(Color.WHITE);
+        departmentsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        departmentsTable.setGridColor(PURPLE);
 
-        JButton btnSave = new RoundedButton("Save Changes", PURPLE, 15);
-        btnSave.setBounds(250, 550, 300, 50);
-        btnSave.setForeground(Color.WHITE);
-        btnSave.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        btnSave.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnSave.addActionListener(e -> saveChanges());
-        add(btnSave);
+        JScrollPane scrollPane = new JScrollPane(departmentsTable);
+        scrollPane.setBounds(50, 170, 700, 350);
+        scrollPane.setBorder(BorderFactory.createLineBorder(PURPLE, 2));
+        add(scrollPane);
+
+        JButton btnSaveChanges = new RoundedButton("Save changes", PURPLE, 15);
+        btnSaveChanges.setBounds(250, 550, 300, 50);
+        btnSaveChanges.setForeground(Color.WHITE);
+        btnSaveChanges.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btnSaveChanges.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnSaveChanges.addActionListener(e -> saveChanges());
+        add(btnSaveChanges);
     }
 
     public void loadDepartmentsData() {
         tableModel.setRowCount(0);
-        List<Department> departments = departmentDAO.getAllDepartments();
-        for (Department d : departments) {
-            tableModel.addRow(new Object[]{
-                    d.getDepartmentId(),
-                    d.getName(),
-                    d.getHod()
-            });
+        List<Department> departments = departmentController.getAllDepartments();
+
+        if (departments != null) {
+            for (Department department : departments) {
+                tableModel.addRow(new Object[]{
+                    department.getDepartmentId(),
+                    department.getName() != null ? department.getName() : "N/A",
+                    department.getHod() != null ? department.getHod() : "N/A"
+                });
+            }
         }
     }
 
-    private void addDepartment() {
+    private void addNewDepartment() {
         JTextField txtName = new JTextField();
         JTextField txtHod = new JTextField();
 
-        Object[] message = {"Name:", txtName, "HOD:", txtHod};
-        int option = JOptionPane.showConfirmDialog(this, message, "Add Department", JOptionPane.OK_CANCEL_OPTION);
+        Object[] message = {
+            "Department Name:", txtName,
+            "Head of Department:", txtHod
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Add New Department", JOptionPane.OK_CANCEL_OPTION);
 
         if (option == JOptionPane.OK_OPTION) {
-            Department dept = new Department(txtName.getText().trim(), txtHod.getText().trim());
-            int id = departmentDAO.createDepartment(dept);
-            if (id > 0) {
-                JOptionPane.showMessageDialog(this, "Department added successfully!");
+            String name = txtName.getText().trim();
+            String hod = txtHod.getText().trim();
+
+            boolean success = departmentController.createDepartment(name, hod);
+
+            if (success) {
                 loadDepartmentsData();
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to add department!", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
 
     private void editDepartment() {
-        int row = table.getSelectedRow();
-        if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Please select a department to edit!");
+        int selectedRow = departmentsTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a department to edit!", "Warning", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        Integer deptId = (Integer) tableModel.getValueAt(row, 0);
-        Department dept = departmentDAO.getDepartmentById(deptId);
-        if (dept == null) return;
+        int departmentId = (int) tableModel.getValueAt(selectedRow, 0);
+        Department department = departmentController.getDepartmentById(departmentId);
 
-        JTextField txtName = new JTextField(dept.getName());
-        JTextField txtHod = new JTextField(dept.getHod());
+        if (department == null) {
+            return;
+        }
 
-        Object[] message = {"Name:", txtName, "HOD:", txtHod};
+        JTextField txtName = new JTextField(department.getName());
+        JTextField txtHod = new JTextField(department.getHod());
+
+        Object[] message = {
+            "Department Name:", txtName,
+            "Head of Department:", txtHod
+        };
+
         int option = JOptionPane.showConfirmDialog(this, message, "Edit Department", JOptionPane.OK_CANCEL_OPTION);
 
         if (option == JOptionPane.OK_OPTION) {
-            dept.setName(txtName.getText().trim());
-            dept.setHod(txtHod.getText().trim());
+            String name = txtName.getText().trim();
+            String hod = txtHod.getText().trim();
 
-            if (departmentDAO.updateDepartment(dept)) {
-                JOptionPane.showMessageDialog(this, "Department updated successfully!");
+            boolean success = departmentController.updateDepartment(departmentId, name, hod);
+
+            if (success) {
                 loadDepartmentsData();
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to update department!", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
 
     private void deleteDepartment() {
-        int row = table.getSelectedRow();
-        if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Please select a department to delete!");
+        int selectedRow = departmentsTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a department to delete!", "Warning", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        Integer deptId = (Integer) tableModel.getValueAt(row, 0);
-        int confirm = JOptionPane.showConfirmDialog(this,
-                "Are you sure you want to delete this department?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
+        int departmentId = (int) tableModel.getValueAt(selectedRow, 0);
 
-        if (confirm == JOptionPane.YES_OPTION) {
-            if (departmentDAO.deleteDepartment(deptId)) {
-                JOptionPane.showMessageDialog(this, "Department deleted successfully!");
-                loadDepartmentsData();
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to delete department!", "Error", JOptionPane.ERROR_MESSAGE);
-            }
+        boolean success = departmentController.deleteDepartment(departmentId);
+
+        if (success) {
+            loadDepartmentsData();
         }
     }
 
     private void saveChanges() {
         loadDepartmentsData();
-        JOptionPane.showMessageDialog(this, "Changes saved successfully!");
+        JOptionPane.showMessageDialog(this, "Changes saved successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
     }
 }

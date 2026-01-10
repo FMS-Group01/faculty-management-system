@@ -1,9 +1,7 @@
 package com.faculty.view;
 
-import com.faculty.dao.LecturerDAO;
-import com.faculty.dao.UserDAO;
+import com.faculty.controller.LecturerController;
 import com.faculty.model.Lecturer;
-import com.faculty.model.User;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -14,18 +12,14 @@ public class LecturersPanel extends JPanel {
 
     private JTable lecturersTable;
     private DefaultTableModel tableModel;
-    private LecturerDAO lecturerDAO;
-    private UserDAO userDAO;
+    private LecturerController lecturerController;
     private final Color PURPLE = new Color(138, 78, 255);
     private final Color LIGHT_GRAY = new Color(220, 220, 220);
 
     public LecturersPanel() {
-        lecturerDAO = new LecturerDAO();
-        userDAO = new UserDAO();
-
+        lecturerController = new LecturerController();
         setLayout(null);
         setBackground(Color.WHITE);
-
         initializeComponents();
         loadLecturersData();
     }
@@ -61,7 +55,7 @@ public class LecturersPanel extends JPanel {
         btnDelete.addActionListener(e -> deleteLecturer());
         add(btnDelete);
 
-        String[] columns = {"Full Name", "Lecturer ID", "Email", "Mobile", "Department ID"};
+        String[] columns = {"Lecturer ID", "Name", "Email", "Mobile", "Department ID"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -94,17 +88,18 @@ public class LecturersPanel extends JPanel {
 
     public void loadLecturersData() {
         tableModel.setRowCount(0);
-        List<Lecturer> lecturers = lecturerDAO.getAllLecturers();
+        List<Lecturer> lecturers = lecturerController.getAllLecturers();
 
-        for (Lecturer lecturer : lecturers) {
-            String deptId = lecturer.getDepartmentId() != null ? String.valueOf(lecturer.getDepartmentId()) : "N/A";
-            tableModel.addRow(new Object[]{
-                    lecturer.getName() != null ? lecturer.getName() : "N/A",
+        if (lecturers != null) {
+            for (Lecturer lecturer : lecturers) {
+                tableModel.addRow(new Object[]{
                     lecturer.getLecturerId(),
+                    lecturer.getName() != null ? lecturer.getName() : "N/A",
                     lecturer.getEmail() != null ? lecturer.getEmail() : "N/A",
                     lecturer.getMobile() != null ? lecturer.getMobile() : "N/A",
-                    deptId
-            });
+                    lecturer.getDepartmentId() != null ? lecturer.getDepartmentId() : "N/A"
+                });
+            }
         }
     }
 
@@ -114,13 +109,15 @@ public class LecturersPanel extends JPanel {
         JTextField txtMobile = new JTextField();
         JTextField txtUsername = new JTextField();
         JPasswordField txtPassword = new JPasswordField();
+        JTextField txtDepartmentId = new JTextField();
 
         Object[] message = {
-                "Full Name:", txtName,
-                "Email:", txtEmail,
-                "Mobile:", txtMobile,
-                "Username:", txtUsername,
-                "Password:", txtPassword
+            "Name:", txtName,
+            "Email:", txtEmail,
+            "Mobile:", txtMobile,
+            "Username:", txtUsername,
+            "Password:", txtPassword,
+            "Department ID:", txtDepartmentId
         };
 
         int option = JOptionPane.showConfirmDialog(this, message, "Add New Lecturer", JOptionPane.OK_CANCEL_OPTION);
@@ -130,32 +127,18 @@ public class LecturersPanel extends JPanel {
             String email = txtEmail.getText().trim();
             String mobile = txtMobile.getText().trim();
             String username = txtUsername.getText().trim();
-            String password = String.valueOf(txtPassword.getPassword());
+            String password = new String(txtPassword.getPassword()).trim();
+            String deptIdStr = txtDepartmentId.getText().trim();
 
-            if (username.isEmpty() || password.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Username and Password are required!", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+            try {
+                int departmentId = Integer.parseInt(deptIdStr);
+                boolean success = lecturerController.createLecturer(name, email, mobile, username, password, departmentId);
 
-            if (lecturerDAO.emailExists(email)) {
-                JOptionPane.showMessageDialog(this, "Email already exists!", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            User user = new User(username, password, "LECTURER");
-            int userId = userDAO.createUser(user);
-
-            if (userId > 0) {
-                Lecturer lecturer = new Lecturer(userId, name, email, mobile, null);
-                int lecturerId = lecturerDAO.createLecturer(lecturer);
-
-                if (lecturerId > 0) {
-                    JOptionPane.showMessageDialog(this, "Lecturer added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                if (success) {
                     loadLecturersData();
-                } else {
-                    userDAO.deleteUser(userId);
-                    JOptionPane.showMessageDialog(this, "Failed to add lecturer!", "Error", JOptionPane.ERROR_MESSAGE);
                 }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Department ID must be a number!", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -167,38 +150,42 @@ public class LecturersPanel extends JPanel {
             return;
         }
 
-        int lecturerId = (int) tableModel.getValueAt(selectedRow, 1);
-        Lecturer lecturer = lecturerDAO.getLecturerById(lecturerId);
+        int lecturerId = (int) tableModel.getValueAt(selectedRow, 0);
+        Lecturer lecturer = lecturerController.getLecturerById(lecturerId);
 
         if (lecturer == null) {
-            JOptionPane.showMessageDialog(this, "Lecturer not found!", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         JTextField txtName = new JTextField(lecturer.getName());
         JTextField txtEmail = new JTextField(lecturer.getEmail());
         JTextField txtMobile = new JTextField(lecturer.getMobile());
+        JTextField txtDepartmentId = new JTextField(String.valueOf(lecturer.getDepartmentId()));
 
         Object[] message = {
-                "Full Name:", txtName,
-                "Email:", txtEmail,
-                "Mobile:", txtMobile
+            "Name:", txtName,
+            "Email:", txtEmail,
+            "Mobile:", txtMobile,
+            "Department ID:", txtDepartmentId
         };
 
         int option = JOptionPane.showConfirmDialog(this, message, "Edit Lecturer", JOptionPane.OK_CANCEL_OPTION);
 
         if (option == JOptionPane.OK_OPTION) {
-            lecturer.setName(txtName.getText().trim());
-            lecturer.setEmail(txtEmail.getText().trim());
-            lecturer.setMobile(txtMobile.getText().trim());
+            String name = txtName.getText().trim();
+            String email = txtEmail.getText().trim();
+            String mobile = txtMobile.getText().trim();
+            String deptIdStr = txtDepartmentId.getText().trim();
 
-            boolean success = lecturerDAO.updateLecturer(lecturer);
+            try {
+                int departmentId = Integer.parseInt(deptIdStr);
+                boolean success = lecturerController.updateLecturer(lecturerId, name, email, mobile, departmentId);
 
-            if (success) {
-                JOptionPane.showMessageDialog(this, "Lecturer updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadLecturersData();
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to update lecturer!", "Error", JOptionPane.ERROR_MESSAGE);
+                if (success) {
+                    loadLecturersData();
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Department ID must be a number!", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -210,22 +197,12 @@ public class LecturersPanel extends JPanel {
             return;
         }
 
-        int lecturerId = (int) tableModel.getValueAt(selectedRow, 1);
+        int lecturerId = (int) tableModel.getValueAt(selectedRow, 0);
 
-        int confirm = JOptionPane.showConfirmDialog(this,
-                "Are you sure you want to delete this lecturer?",
-                "Confirm Delete",
-                JOptionPane.YES_NO_OPTION);
+        boolean success = lecturerController.deleteLecturer(lecturerId);
 
-        if (confirm == JOptionPane.YES_OPTION) {
-            boolean success = lecturerDAO.deleteLecturer(lecturerId);
-
-            if (success) {
-                JOptionPane.showMessageDialog(this, "Lecturer deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadLecturersData();
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to delete lecturer!", "Error", JOptionPane.ERROR_MESSAGE);
-            }
+        if (success) {
+            loadLecturersData();
         }
     }
 
