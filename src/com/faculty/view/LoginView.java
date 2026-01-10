@@ -410,7 +410,7 @@ public class LoginView extends JFrame {
                 new AdminDashboardView();
             } else if (userRole.equals("STUDENT")) {
                 this.dispose();
-                new StudentDashboardView();
+                new StudentDashboardView(username);
             }
         }
     }
@@ -429,7 +429,7 @@ public class LoginView extends JFrame {
                 new AdminDashboardView();
             } else if (user.getRole().equals("STUDENT")) {
                 this.dispose();
-                new StudentDashboardView();
+                new StudentDashboardView(user.getUsername());
             }
         }
     }
