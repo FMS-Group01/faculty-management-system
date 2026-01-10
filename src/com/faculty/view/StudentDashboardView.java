@@ -84,25 +84,10 @@ public class StudentDashboardView extends JFrame {
         profileBtn.setContentAreaFilled(true);
         profileBtn.setOpaque(true);
 
-        JPanel btnIcon = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(new Color(138, 78, 255));
-                g2d.fillOval(6, 2, 18, 18);
-                g2d.fillRoundRect(3, 20, 28, 14, 20, 20);
-            }
-        };
-        btnIcon.setPreferredSize(new Dimension(35, 36));
-        btnIcon.setBackground(Color.WHITE);
-
         JLabel profileLabel = new JLabel("Profile Details");
         profileLabel.setFont(new Font("Arial", Font.BOLD, 16));
         profileLabel.setForeground(new Color(138, 78, 255));
 
-        profileBtn.add(btnIcon);
         profileBtn.add(profileLabel);
         profileBtn.addActionListener(e -> cardLayout.show(contentArea, "PROFILE"));
 
@@ -120,7 +105,7 @@ public class StudentDashboardView extends JFrame {
         timetableBtn.setContentAreaFilled(true);
         timetableBtn.setOpaque(true);
 
-        JLabel timetableLabel = new JLabel("Time table");
+        JLabel timetableLabel = new JLabel("Time Table");
         timetableLabel.setFont(new Font("Arial", Font.BOLD, 16));
         timetableLabel.setForeground(new Color(138, 78, 255));
 
