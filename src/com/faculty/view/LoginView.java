@@ -213,8 +213,8 @@ public class LoginView extends JFrame {
         lblRole.setBounds(60, 190, 200, 20);
 
         btnAdmin = createRoleButton("Admin", 60, 220);
-        btnStudent = createRoleButton("Student", 205, 220);
-        btnLecturer = createRoleButton("Lecturer", 350, 220);
+        btnStudent = createRoleButton("Student", 215, 220);
+        btnLecturer = createRoleButton("Lecturer", 370, 220);
 
         setActiveRole(btnAdmin);
 
@@ -352,7 +352,7 @@ public class LoginView extends JFrame {
     // role button style
     private JButton createRoleButton(String text, int x, int y) {
         RoundedButton btn = new RoundedButton(text, Color.LIGHT_GRAY, 15);
-        btn.setBounds(x, y, 135, 45);
+        btn.setBounds(x, y, 150, 45);
         btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btn.setForeground(Color.WHITE);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
