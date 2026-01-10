@@ -1,8 +1,12 @@
 package com.faculty.view;
 
 import javax.swing.*;
+import javax.swing.table.*;
 import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.*;
 import java.sql.*;
+import java.sql.Types;
 import com.faculty.util.DatabaseConnection;
 
 public class StudentDashboardView extends JFrame {
@@ -13,20 +17,19 @@ public class StudentDashboardView extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        // Main layout
         setLayout(new BorderLayout());
 
-        // 1. Sidebar Panel (Purple Region)
         JPanel sidebar = new JPanel();
         sidebar.setBackground(new Color(138, 78, 255));
-        sidebar.setLayout(new BorderLayout());
+        sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
 
-        // User icon panel (centered at top)
+        sidebar.add(Box.createVerticalStrut(20));
+
         JPanel userIconPanel = new JPanel();
         userIconPanel.setBackground(new Color(138, 78, 255));
         userIconPanel.setLayout(new BoxLayout(userIconPanel, BoxLayout.Y_AXIS));
+        userIconPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Create custom user icon
         JPanel userIcon = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -44,53 +47,42 @@ public class StudentDashboardView extends JFrame {
         userIcon.setBackground(new Color(138, 78, 255));
 
         userIconPanel.add(userIcon);
+        userIconPanel.add(Box.createVerticalStrut(20));
 
-        // Welcome text
         JLabel welcomeLabel = new JLabel("Welcome, " + username);
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 24));
         welcomeLabel.setForeground(Color.WHITE);
         welcomeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        userIconPanel.add(Box.createVerticalStrut(10));
         userIconPanel.add(welcomeLabel);
 
-        sidebar.add(userIconPanel, BorderLayout.NORTH);
+        sidebar.add(userIconPanel);
+        sidebar.add(Box.createVerticalStrut(40));
 
-        // 2. Content Panel (White Region) - CardLayout for switching
         JPanel contentArea = new JPanel();
         contentArea.setBackground(Color.WHITE);
         CardLayout cardLayout = new CardLayout();
         contentArea.setLayout(cardLayout);
 
-        // Menu buttons panel - REDUCED SPACING
         JPanel menuPanel = new JPanel();
         menuPanel.setBackground(new Color(138, 78, 255));
         menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
-        menuPanel.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
+        menuPanel.setBorder(BorderFactory.createEmptyBorder(0, 12, 8, 12));
+        menuPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Helper sizes
         Dimension buttonSize = new Dimension(270, 48);
         int buttonMaxHeight = 48;
 
-        // Profile Details button
-        JButton profileBtn = new JButton() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(getBackground());
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
-                super.paintComponent(g);
-            }
-        };
-        profileBtn.setLayout(new FlowLayout(FlowLayout.LEFT, 12, 4));
+        JButton profileBtn = new JButton();
+        profileBtn.setLayout(new FlowLayout(FlowLayout.CENTER, 12, 4));
         profileBtn.setBackground(Color.WHITE);
         profileBtn.setPreferredSize(buttonSize);
         profileBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, buttonMaxHeight));
         profileBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         profileBtn.setFocusPainted(false);
         profileBtn.setBorderPainted(false);
-        profileBtn.setContentAreaFilled(false);
+        profileBtn.setContentAreaFilled(true);
+        profileBtn.setOpaque(true);
 
         JPanel btnIcon = new JPanel() {
             @Override
@@ -114,26 +106,10 @@ public class StudentDashboardView extends JFrame {
         profileBtn.add(profileLabel);
         profileBtn.addActionListener(e -> cardLayout.show(contentArea, "PROFILE"));
 
-        JPanel buttonWrapper = new JPanel();
-        buttonWrapper.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-        buttonWrapper.setBackground(new Color(138, 78, 255));
-        buttonWrapper.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
-        buttonWrapper.add(profileBtn);
+        menuPanel.add(profileBtn);
+        menuPanel.add(Box.createVerticalStrut(30));
 
-        menuPanel.add(buttonWrapper);
-        menuPanel.add(Box.createVerticalStrut(2));
-
-        // Time table button
-        JButton timetableBtn = new JButton() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(getBackground());
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
-                super.paintComponent(g);
-            }
-        };
+        JButton timetableBtn = new JButton();
         timetableBtn.setLayout(new FlowLayout(FlowLayout.CENTER, 12, 4));
         timetableBtn.setBackground(Color.WHITE);
         timetableBtn.setPreferredSize(buttonSize);
@@ -141,39 +117,20 @@ public class StudentDashboardView extends JFrame {
         timetableBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         timetableBtn.setFocusPainted(false);
         timetableBtn.setBorderPainted(false);
-        timetableBtn.setContentAreaFilled(false);
+        timetableBtn.setContentAreaFilled(true);
+        timetableBtn.setOpaque(true);
 
-        JLabel calendarIcon = new JLabel("\u2637");
-        calendarIcon.setFont(new Font("Arial", Font.PLAIN, 26));
-        calendarIcon.setForeground(new Color(138, 78, 255));
         JLabel timetableLabel = new JLabel("Time table");
         timetableLabel.setFont(new Font("Arial", Font.BOLD, 16));
         timetableLabel.setForeground(new Color(138, 78, 255));
 
-        timetableBtn.add(calendarIcon);
         timetableBtn.add(timetableLabel);
         timetableBtn.addActionListener(e -> cardLayout.show(contentArea, "TIMETABLE"));
 
-        JPanel timetableWrapper = new JPanel();
-        timetableWrapper.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-        timetableWrapper.setBackground(new Color(138, 78, 255));
-        timetableWrapper.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
-        timetableWrapper.add(timetableBtn);
+        menuPanel.add(timetableBtn);
+        menuPanel.add(Box.createVerticalStrut(30));
 
-        menuPanel.add(timetableWrapper);
-        menuPanel.add(Box.createVerticalStrut(2));
-
-        // Courses Enrolled button
-        JButton coursesBtn = new JButton() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(getBackground());
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
-                super.paintComponent(g);
-            }
-        };
+        JButton coursesBtn = new JButton();
         coursesBtn.setLayout(new FlowLayout(FlowLayout.CENTER, 12, 4));
         coursesBtn.setBackground(Color.WHITE);
         coursesBtn.setPreferredSize(buttonSize);
@@ -181,73 +138,44 @@ public class StudentDashboardView extends JFrame {
         coursesBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         coursesBtn.setFocusPainted(false);
         coursesBtn.setBorderPainted(false);
-        coursesBtn.setContentAreaFilled(false);
+        coursesBtn.setContentAreaFilled(true);
+        coursesBtn.setOpaque(true);
 
-        JLabel bookIcon = new JLabel("\u2398");
-        bookIcon.setFont(new Font("Arial", Font.PLAIN, 26));
-        bookIcon.setForeground(new Color(138, 78, 255));
         JLabel coursesLabel = new JLabel("Courses Enrolled");
         coursesLabel.setFont(new Font("Arial", Font.BOLD, 16));
         coursesLabel.setForeground(new Color(138, 78, 255));
 
-        coursesBtn.add(bookIcon);
         coursesBtn.add(coursesLabel);
         coursesBtn.addActionListener(e -> cardLayout.show(contentArea, "COURSES"));
 
-        JPanel coursesWrapper = new JPanel();
-        coursesWrapper.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-        coursesWrapper.setBackground(new Color(138, 78, 255));
-        coursesWrapper.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
-        coursesWrapper.add(coursesBtn);
+        menuPanel.add(coursesBtn);
 
-        menuPanel.add(coursesWrapper);
-        menuPanel.add(Box.createVerticalStrut(2));
+        sidebar.add(menuPanel);
+        sidebar.add(Box.createVerticalGlue());
 
-        // Logout button (4th button)
-        JButton logoutBtn = new JButton() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(getBackground());
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
-                super.paintComponent(g);
-            }
-        };
-        logoutBtn.setLayout(new FlowLayout(FlowLayout.CENTER, 12, 4));
-        logoutBtn.setBackground(Color.WHITE);
-        logoutBtn.setPreferredSize(buttonSize);
-        logoutBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, buttonMaxHeight));
-        logoutBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        logoutBtn.setFocusPainted(false);
-        logoutBtn.setBorderPainted(false);
-        logoutBtn.setContentAreaFilled(false);
-
-        JLabel logoutIcon = new JLabel("\u2325");
-        logoutIcon.setFont(new Font("Arial", Font.PLAIN, 26));
-        logoutIcon.setForeground(new Color(138, 78, 255));
-        JLabel logoutLabel = new JLabel("Logout");
-        logoutLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        logoutLabel.setForeground(new Color(138, 78, 255));
-
-        logoutBtn.add(logoutIcon);
-        logoutBtn.add(logoutLabel);
-        logoutBtn.addActionListener(e -> {
+        // Create logout button at the bottom
+        JButton logoutButton = new JButton("Logout");
+        logoutButton.setBackground(Color.WHITE);
+        logoutButton.setForeground(new Color(138, 78, 255));
+        logoutButton.setFont(new Font("Arial", Font.BOLD, 14));
+        logoutButton.setPreferredSize(new Dimension(75, 48));
+        logoutButton.setMaximumSize(new Dimension(75, 48));
+        logoutButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        logoutButton.setFocusPainted(false);
+        logoutButton.setBorderPainted(true);
+        logoutButton.setBorder(BorderFactory.createLineBorder(new Color(138, 78, 255), 2));
+        logoutButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        logoutButton.addActionListener(e -> {
             dispose();
-            SwingUtilities.invokeLater(() -> new LoginView());
+            SwingUtilities.invokeLater(() -> {
+                LoginView loginView = new LoginView();
+                loginView.setVisible(true);
+            });
         });
 
-        JPanel logoutWrapper = new JPanel();
-        logoutWrapper.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-        logoutWrapper.setBackground(new Color(138, 78, 255));
-        logoutWrapper.setBorder(BorderFactory.createEmptyBorder(0, 6, 0, 6));
-        logoutWrapper.add(logoutBtn);
+        sidebar.add(logoutButton);
+        sidebar.add(Box.createVerticalStrut(20));
 
-        menuPanel.add(logoutWrapper);
-
-        sidebar.add(menuPanel, BorderLayout.CENTER);
-
-        // Fetch student data from database
         String fullName = "";
         String studentId = "";
         String degree = "";
@@ -276,31 +204,186 @@ public class StudentDashboardView extends JFrame {
             e.printStackTrace();
         }
 
-        // Profile Details Panel
         JPanel profileDetailsPanel = createProfileDetailsPanel(username, fullName, studentId, degree, email, mobile);
         contentArea.add(profileDetailsPanel, "PROFILE");
 
-        // Time table Panel
         JPanel timetablePanel = new JPanel(new BorderLayout());
         timetablePanel.setBackground(Color.WHITE);
+
         JLabel timetableHeading = new JLabel("Time table", SwingConstants.CENTER);
         timetableHeading.setFont(new Font("Arial", Font.BOLD, 36));
         timetableHeading.setForeground(new Color(138, 78, 255));
-        timetableHeading.setBorder(BorderFactory.createEmptyBorder(50, 0, 20, 0));
+        timetableHeading.setBorder(BorderFactory.createEmptyBorder(30, 0, 30, 0));
         timetablePanel.add(timetableHeading, BorderLayout.NORTH);
+
+        String[] columnNames = {"Time", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"};
+        Object[][] data = {
+                {"08:00", "OOP", "OOP", "OOP", "OOP", "OOP"},
+                {"10:00", "OOP", "OOP", "OOP", "OOP", "OOP"},
+                {"Interval", "", "", "", "", ""},
+                {"01:00", "SE", "OOP", "SE", "SE", "SE"},
+                {"03:00", "SE", "OOP", "SE", "SE", "SE"}
+        };
+
+        JTable table = new JTable(data, columnNames) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        table.setFont(new Font("Arial", Font.BOLD, 20));
+        table.setForeground(new Color(138, 78, 255));
+        table.setBackground(Color.WHITE);
+        table.setRowHeight(80);
+        table.setGridColor(new Color(138, 78, 255));
+        table.setShowGrid(true);
+        table.setIntercellSpacing(new Dimension(2, 2));
+
+        table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 22));
+        table.getTableHeader().setForeground(new Color(138, 78, 255));
+        table.getTableHeader().setBackground(Color.WHITE);
+        table.getTableHeader().setPreferredSize(new Dimension(0, 60));
+
+        // Custom renderer with merged cells for Interval row
+        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                                                           boolean isSelected, boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setHorizontalAlignment(JLabel.CENTER);
+                setVerticalAlignment(JLabel.CENTER);
+
+                if (row == 2) {
+                    setBackground(new Color(138, 78, 255));
+                    setForeground(Color.WHITE);
+                    setFont(new Font("Arial", Font.BOLD, 24));
+                    // Only show text in first column for merged appearance
+                    if (column == 0) {
+                        setText("Interval");
+                    } else {
+                        setText("");
+                    }
+                } else {
+                    setBackground(Color.WHITE);
+                    setForeground(new Color(138, 78, 255));
+                    setFont(new Font("Arial", Font.BOLD, 20));
+                }
+
+                setOpaque(true);
+                return this;
+            }
+        });
+
+        // Custom UI to paint merged cell appearance
+        table.setUI(new javax.swing.plaf.basic.BasicTableUI() {
+            @Override
+            public void paint(Graphics g, JComponent c) {
+                super.paint(g, c);
+
+                // Draw a visual merge effect for row 2 (Interval row)
+                Rectangle cellRect = table.getCellRect(2, 0, false);
+                if (cellRect != null) {
+                    int rowHeight = table.getRowHeight(2);
+                    int tableWidth = 0;
+                    for (int i = 0; i < table.getColumnCount(); i++) {
+                        tableWidth += table.getColumnModel().getColumn(i).getWidth();
+                    }
+
+                    // Fill the entire row with purple
+                    g.setColor(new Color(138, 78, 255));
+                    g.fillRect(cellRect.x, cellRect.y, tableWidth, rowHeight);
+
+                    // Draw "Interval" text centered
+                    g.setColor(Color.WHITE);
+                    g.setFont(new Font("Arial", Font.BOLD, 24));
+                    FontMetrics fm = g.getFontMetrics();
+                    String text = "Interval";
+                    int textWidth = fm.stringWidth(text);
+                    int textX = (tableWidth - textWidth) / 2;
+                    int textY = cellRect.y + (rowHeight - fm.getHeight()) / 2 + fm.getAscent();
+                    g.drawString(text, textX, textY);
+                }
+            }
+        });
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(138, 78, 255), 2));
+
+        JPanel centerPanel = new JPanel(new GridBagLayout());
+        centerPanel.setBackground(Color.WHITE);
+        centerPanel.add(scrollPane);
+
+        timetablePanel.add(centerPanel, BorderLayout.CENTER);
         contentArea.add(timetablePanel, "TIMETABLE");
 
-        // Courses Enrolled Panel
         JPanel coursesPanel = new JPanel(new BorderLayout());
         coursesPanel.setBackground(Color.WHITE);
         JLabel coursesHeading = new JLabel("Courses Enrolled", SwingConstants.CENTER);
         coursesHeading.setFont(new Font("Arial", Font.BOLD, 36));
         coursesHeading.setForeground(new Color(138, 78, 255));
-        coursesHeading.setBorder(BorderFactory.createEmptyBorder(50, 0, 20, 0));
+        coursesHeading.setBorder(BorderFactory.createEmptyBorder(30, 0, 30, 0));
         coursesPanel.add(coursesHeading, BorderLayout.NORTH);
+
+        // Create courses table
+        String[] coursesColumnNames = {"Course code", "Course name", "Credits", "Grade"};
+        Object[][] coursesData = {
+                {"ETEC 21062", "OOP", "2", "A+"},
+                {"ETEC 21052", "OOP", "2", "B"},
+                {"ETEC 21042", "OOP", "2", "A"},
+                {"ETEC 21032", "OOP", "2", "D"},
+                {"ETEC 21022", "OOP", "2", "C"},
+                {"ETEC 21012", "OOP", "2", "B"}
+        };
+
+        JTable coursesTable = new JTable(coursesData, coursesColumnNames) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        coursesTable.setFont(new Font("Arial", Font.BOLD, 20));
+        coursesTable.setForeground(new Color(138, 78, 255));
+        coursesTable.setBackground(Color.WHITE);
+        coursesTable.setRowHeight(80);
+        coursesTable.setGridColor(new Color(138, 78, 255));
+        coursesTable.setShowGrid(true);
+        coursesTable.setIntercellSpacing(new Dimension(2, 2));
+
+        coursesTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 22));
+        coursesTable.getTableHeader().setForeground(new Color(138, 78, 255));
+        coursesTable.getTableHeader().setBackground(Color.WHITE);
+        coursesTable.getTableHeader().setPreferredSize(new Dimension(0, 60));
+
+        // Make the first column (Course code) wider
+        coursesTable.getColumnModel().getColumn(0).setPreferredWidth(250);
+
+        coursesTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                                                           boolean isSelected, boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setHorizontalAlignment(JLabel.CENTER);
+                setVerticalAlignment(JLabel.CENTER);
+                setBackground(Color.WHITE);
+                setForeground(new Color(138, 78, 255));
+                setFont(new Font("Arial", Font.BOLD, 20));
+                setOpaque(true);
+                return this;
+            }
+        });
+
+        JScrollPane coursesScrollPane = new JScrollPane(coursesTable);
+        coursesScrollPane.setBorder(BorderFactory.createLineBorder(new Color(138, 78, 255), 2));
+
+        JPanel coursesCenterPanel = new JPanel(new GridBagLayout());
+        coursesCenterPanel.setBackground(Color.WHITE);
+        coursesCenterPanel.add(coursesScrollPane);
+
+        coursesPanel.add(coursesCenterPanel, BorderLayout.CENTER);
         contentArea.add(coursesPanel, "COURSES");
 
-        // Split pane
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sidebar, contentArea);
         splitPane.setResizeWeight(0.35);
         splitPane.setDividerSize(0);
@@ -332,7 +415,6 @@ public class StudentDashboardView extends JFrame {
         gbc.insets = new Insets(15, 10, 15, 10);
         gbc.anchor = GridBagConstraints.WEST;
 
-        // Full Name
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.insets = new Insets(0, 10, 15, 10);
@@ -349,12 +431,11 @@ public class StudentDashboardView extends JFrame {
         fullNameField.setForeground(new Color(138, 78, 255));
         fullNameField.setPreferredSize(new Dimension(500, 50));
         fullNameField.setBorder(BorderFactory.createCompoundBorder(
-                new RoundedBorder(new Color(138, 78, 255), 2, 15),
+                BorderFactory.createLineBorder(new Color(138, 78, 255), 2),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         formPanel.add(fullNameField, gbc);
 
-        // Student ID
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.weightx = 0;
@@ -373,13 +454,12 @@ public class StudentDashboardView extends JFrame {
         studentIdField.setForeground(new Color(138, 78, 255));
         studentIdField.setPreferredSize(new Dimension(500, 50));
         studentIdField.setBorder(BorderFactory.createCompoundBorder(
-                new RoundedBorder(new Color(138, 78, 255), 2, 15),
+                BorderFactory.createLineBorder(new Color(138, 78, 255), 2),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         studentIdField.setEditable(studentId == null || studentId.isEmpty());
         formPanel.add(studentIdField, gbc);
 
-        // Degree
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.weightx = 0;
@@ -397,12 +477,11 @@ public class StudentDashboardView extends JFrame {
         degreeField.setForeground(new Color(138, 78, 255));
         degreeField.setPreferredSize(new Dimension(500, 50));
         degreeField.setBorder(BorderFactory.createCompoundBorder(
-                new RoundedBorder(new Color(138, 78, 255), 2, 15),
+                BorderFactory.createLineBorder(new Color(138, 78, 255), 2),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         formPanel.add(degreeField, gbc);
 
-        // Email
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.weightx = 0;
@@ -420,12 +499,11 @@ public class StudentDashboardView extends JFrame {
         emailField.setForeground(new Color(138, 78, 255));
         emailField.setPreferredSize(new Dimension(500, 50));
         emailField.setBorder(BorderFactory.createCompoundBorder(
-                new RoundedBorder(new Color(138, 78, 255), 2, 15),
+                BorderFactory.createLineBorder(new Color(138, 78, 255), 2),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         formPanel.add(emailField, gbc);
 
-        // Mobile Number
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.weightx = 0;
@@ -443,7 +521,7 @@ public class StudentDashboardView extends JFrame {
         mobileField.setForeground(new Color(138, 78, 255));
         mobileField.setPreferredSize(new Dimension(500, 50));
         mobileField.setBorder(BorderFactory.createCompoundBorder(
-                new RoundedBorder(new Color(138, 78, 255), 2, 15),
+                BorderFactory.createLineBorder(new Color(138, 78, 255), 2),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         formPanel.add(mobileField, gbc);
@@ -451,17 +529,7 @@ public class StudentDashboardView extends JFrame {
         formContainer.add(formPanel);
         formContainer.add(Box.createVerticalStrut(30));
 
-        // Save button
-        JButton saveButton = new JButton("Save changes") {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(getBackground());
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
-                super.paintComponent(g);
-            }
-        };
+        JButton saveButton = new JButton("Save changes");
         saveButton.setFont(new Font("Arial", Font.BOLD, 20));
         saveButton.setForeground(Color.WHITE);
         saveButton.setBackground(new Color(138, 78, 255));
@@ -470,7 +538,8 @@ public class StudentDashboardView extends JFrame {
         saveButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         saveButton.setFocusPainted(false);
         saveButton.setBorderPainted(false);
-        saveButton.setContentAreaFilled(false);
+        saveButton.setContentAreaFilled(true);
+        saveButton.setOpaque(true);
 
         saveButton.addActionListener(e -> {
             try {
